@@ -1,0 +1,19 @@
+version: '3.4'
+networks:
+  cardino:
+    name: cardino-network
+
+services:
+  api:
+    image: cardino
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: cardino-api
+    env_file: ./.env
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - 8000:8000
+    networks:
+      - cardino
