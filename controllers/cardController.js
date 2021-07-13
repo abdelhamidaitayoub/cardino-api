@@ -1,92 +1,66 @@
-const Card = require('../models/cardModel');
+const Card = require('../models/Card');
+const CustomError = require('../utils/customError');
+const catchAsync = require('../utils/catchAsync');
+const ApiResources = require('../utils/apiResources');
 
-exports.getAll = async (req, res) => {
-  try {
-    const cards = await Card.find();
-    res.json({
-      status: 'seccess',
-      data: {
-        cards,
-      },
-    });
-  } catch (err) {
-    res.json({
-      status: 'error',
-      err,
-    });
-  }
-};
+exports.getAll = catchAsync(async (req, res, next) => {
 
-exports.create = async (req, res) => {
-  try {
-    const card = await Card.create(req.body);
-    res.json({
-      status: 'seccess',
-      data: {
-        card,
-      },
-    });
-  } catch (err) {
-    res.json({
-      status: 'error',
-      err,
-    });
-  }
-};
+  const api = new ApiResources(Card.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
-exports.getOne = async (req, res) => {
-  try {
-    // console.log(req.params);
-    const card = await Card.findById(req.params.cardId);
-    // if(!card)
-    res.json({
-      status: 'seccess',
-      data: {
-        card,
-      },
-    });
-  } catch (err) {
-    res.json({
-      status: 'error',
-      err,
-    });
-  }
-};
+  const cards = await api.query;
+  res.json({
+    status: 'seccess',
+    result: cards.length,
+    data: {
+      cards,
+    },
+  });
+});
 
-exports.delate = async (req, res) => {
-  try {
-    await Card.findByIdAndDelete(req.params.cardId);
-    res.json({
-      status: 'success',
-      date: null,
-    });
-  } catch (err) {
-    res.json({
-      status: 'error',
-      err,
-    });
-  }
-};
+exports.create = catchAsync(async (req, res) => {
+  const card = await Card.create(req.body);
+  res.json({
+    status: 'seccess',
+    data: {
+      card,
+    },
+  });
+});
 
-exports.update = async (req, res) => {
-  try {
-    const updatedCard = await Card.findByIdAndUpdate(
-      req.params.cardId,
-      req.body,
-      { new: true }
-    );
-    res.json({
-      status: 'success',
-      data: {
-        updatedCard,
-      },
-    });
-  } catch (err) {
-    res.json({
-      status: 'error',
-      data: {
-        err,
-      },
-    });
-  }
-};
+exports.getOne = catchAsync(async (req, res) => {
+  // console.log(req.params);
+  const card = await Card.findById(req.params.cardId);
+  // if(!card)
+  res.json({
+    status: 'seccess',
+    data: {
+      card,
+    },
+  });
+});
+
+exports.delate = catchAsync(async (req, res) => {
+  await Card.findByIdAndDelete(req.params.cardId);
+  res.json({
+    status: 'success',
+    date: null,
+  });
+});
+
+exports.update = catchAsync(async (req, res) => {
+  const updatedCard = await Card.findByIdAndUpdate(
+    req.params.cardId,
+    req.body,
+    { new: true }
+  );
+  res.json({
+    status: 'success',
+    data: {
+      updatedCard,
+    },
+  });
+});
