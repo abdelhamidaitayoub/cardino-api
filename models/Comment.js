@@ -11,7 +11,7 @@ const commentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Card'
   },
-},{timestamps: true});
+}, { timestamps: true });
 
 const Comment = mongoose.model('Comment', commentSchema);
 

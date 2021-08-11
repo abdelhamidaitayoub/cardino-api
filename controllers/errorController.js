@@ -1,27 +1,27 @@
-const CustomError = require('../utils/customError');
+const AppError = require('../utils/AppError');
 
 const handleCastErrorDB = (err) => {
   const msg = `invalid ${err.path}: ${err.value}`;
-  return new CustomError(msg, 400);
+  return new AppError(msg, 400);
 };
 
 const handleDeplicateFieldsDB = (err) => {
   const [key] = Object.keys(err.keyValue);
   const value = err.keyValue[key];
   const msg = `Deplicate fields value : { ${key}: "${value}" }, please try anothor value!`;
-  return new CustomError(msg, 400);
+  return new AppError(msg, 400);
 };
 const handleValidationErrorDB = (err) => {
   const errors = Object.values(err.errors).map((el) => el.message);
   const msg = `invalid input data. ${errors.join('. ')}`;
-  return new CustomError(msg, 400);
+  return new AppError(msg, 400);
 };
 
 const handleJsonWebTokenErrorDB = () =>
-  new CustomError('invalide token, please log in again', 401);
+  new AppError('invalide token, please log in again', 401);
 
 const handleTokenExpiredErrorDB = () =>
-  new CustomError('expired token, please log in again', 401);
+  new AppError('expired token, please log in again', 401);
 
 const sendErrorDev = (err, req, res) => {
   // API
