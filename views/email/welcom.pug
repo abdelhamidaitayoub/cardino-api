@@ -1,0 +1,16 @@
+extends baseEmail
+
+block content
+  p Hi #{firstName},
+  p Welcom to Cardino, we're glad to have you 👋👋
+  p We're all a big familly here, so make sure to update your information & upload your user photo, so we get to know you a bit better
+  table.btn.btn-primary(role="presentation" border="0" cellpadding="0" cellspacing="0")
+    tbody
+      tr
+        td(align="left")
+          table(role="presentation" border="0" cellpadding="0" cellspacing="0")
+            tbody
+              tr
+                td
+                  a(href=`${url}` target="_blank") Update your information
+  p Abdelhamid Ait-ayoub - CEO
