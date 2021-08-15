@@ -40,7 +40,12 @@ const cardSchema = new mongoose.Schema(
         return readingTime(this.md).text;
       },
     },
+    viewedBy: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
     viewsCount: Number,
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -71,6 +76,21 @@ cardSchema.pre(/^find/, function (next) {
   this.populate({ path: 'user' });
   next();
 });
+
+cardSchema.pre('save', function (next) {
+  if (!this.published) return next();
+  this.publishedAt = Date.now();
+  next();
+});
+
+//
+// POPULATE VIRTUALS
+//
+// cardSchema.virtual('viewedBy', {
+//   ref: 'User',
+//   localField: '_id',
+//   foreignField: '_id'
+// });
 
 const Card = mongoose.model('Card', cardSchema);
 

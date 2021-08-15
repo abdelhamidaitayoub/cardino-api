@@ -4,6 +4,9 @@ const authController = require('../controllers/authController');
 
 const router = express();
 
+router.patch('/:slug/addView', authController.protect, cardController.addView);
+router.get('/stats', cardController.toursStats);
+
 router.post(
   '/uploadImage',
   authController.protect,
@@ -25,6 +28,11 @@ router
   .route('/:cardId')
   .get(cardController.getOne)
   .delete(cardController.delate)
-  .patch(cardController.update);
+  .patch(
+    authController.protect,
+    cardController.uploadCardCover,
+    cardController.resizeCardCover,
+    cardController.update
+  );
 
 module.exports = router;

@@ -6,6 +6,7 @@ const authController = require('../controllers/authController');
 const router = express();
 
 router.get('/:tag/cards', cardController.getAllByTag);
+router.get('/:tag/top-5-cards', cardController.topFiveForTag);
 
 router
   .route('/')

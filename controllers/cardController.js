@@ -31,7 +31,7 @@ exports.resizeCardImage = catchAsync(async (req, res, next) => {
 
   await sharp(req.file.buffer)
     .resize(2000, 1333)
-    .toFormat('jpeg')
+    // .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`public/images/cards/${req.file.filename}`);
 
@@ -114,9 +114,14 @@ exports.delate = catchAsync(async (req, res, next) => {
 });
 
 exports.update = catchAsync(async (req, res, next) => {
+  const data = { ...req.body };
+
+  if (req.file) data.cover = req.file.filename;
+
+  console.log(data);
   const updatedCard = await Card.findByIdAndUpdate(
     req.params.cardId,
-    req.body,
+    data,
     {
       new: true,
       runValidators: true,
@@ -153,6 +158,20 @@ exports.getAllByTag = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.topFiveForTag = catchAsync(async (req, res, next) => {
+  const cards = await Card.find({ tags: req.params.tag })
+    .sort({ viewsCount: 1 })
+    .limit(5);
+
+  res.status(200).json({
+    status: 'success',
+    result: cards.length,
+    data: {
+      cards,
+    },
+  });
+});
+
 exports.uploadImage = catchAsync(async (req, res, next) => {
   const url = `${req.protocol}://${req.get('host')}/images/cards/${
     req.file.filename
@@ -162,6 +181,53 @@ exports.uploadImage = catchAsync(async (req, res, next) => {
     data: {
       url,
       filename: req.file.filename,
+    },
+  });
+});
+
+exports.addView = catchAsync(async (req, res, next) => {
+  const updatedCard = await Card.findOneAndUpdate(
+    { slug: req.params.slug },
+    { $addToSet: { viewedBy: req.user._id } },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!updatedCard) {
+    return next(new AppError(`Can't find slug: ${req.params.slug}`, 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      updatedCard,
+    },
+  });
+});
+
+exports.toursStats = catchAsync(async (req, res, next) => {
+  const stats = await Card.aggregate([
+    {
+      $match: {},
+    },
+    {
+      $group: {
+        _id: { $toUpper: '$difficulty' },
+        count: { $sum: 1 },
+        avgRatings: { $avg: '$ratingsAverage' },
+        sumPrice: { $sum: '$price' },
+        maxPrice: { $max: '$price' },
+        minPrice: { $min: '$price' },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      stats,
     },
   });
 });
