@@ -45,7 +45,7 @@ app.use(hpp());
 //# Limit repeated requests
 const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: 100,
+  max: 500,
   headers: true,
   message: 'You have exceeded the 100 requests in 1 hrs limit!',
 });
